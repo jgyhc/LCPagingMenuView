@@ -8,8 +8,8 @@
 
 Pod::Spec.new do |s|
   s.name             = 'LCPagingMenuView'
-  s.version          = '0.1.0'
-  s.summary          = 'A short description of LCPagingMenuView.'
+  s.version          = '0.1.1'
+  s.summary          = '分页控制LCPagingMenuView.'
 
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?
@@ -39,4 +39,6 @@ TODO: Add long description of the pod here.
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'UIKit', 'MapKit'
   # s.dependency 'AFNetworking', '~> 2.3'
+    s.dependency 'Masonry'
+    s.dependency 'MJUIKit'
 end

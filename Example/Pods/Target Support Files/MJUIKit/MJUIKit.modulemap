@@ -1,0 +1,6 @@
+framework module MJUIKit {
+  umbrella header "MJUIKit-umbrella.h"
+
+  export *
+  module * { export * }
+}

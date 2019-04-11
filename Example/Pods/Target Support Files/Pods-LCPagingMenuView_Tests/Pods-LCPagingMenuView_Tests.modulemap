@@ -1,0 +1,6 @@
+framework module Pods_LCPagingMenuView_Tests {
+  umbrella header "Pods-LCPagingMenuView_Tests-umbrella.h"
+
+  export *
+  module * { export * }
+}
