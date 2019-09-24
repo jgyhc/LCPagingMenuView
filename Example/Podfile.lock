@@ -1,6 +1,6 @@
 PODS:
   - CTMediator (25)
-  - LCPagingMenuView (0.1.0):
+  - LCPagingMenuView (0.1.2):
     - Masonry
     - MJUIKit
   - Masonry (1.1.0)
@@ -23,10 +23,10 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   CTMediator: 830c1fc204b3a6abf2a059510c7380f56343da0f
-  LCPagingMenuView: 28f07fef2ff654fb2c883fbd31e6566447d69fdf
+  LCPagingMenuView: c2b4a8048399b13de6f99a406ef380247bd88999
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
   MJUIKit: a1fa449449ce4d78c389a4a9e082f5961512d921
 
 PODFILE CHECKSUM: c70f63cb5e346d4730ae02a627e5634e733cd346
 
-COCOAPODS: 1.6.0
+COCOAPODS: 1.7.2

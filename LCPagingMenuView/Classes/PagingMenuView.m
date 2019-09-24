@@ -13,7 +13,7 @@
 #define PM_SCREEN_WIDTH [UIScreen mainScreen].bounds.size.width
 #define PM_SCREEN_HEIGHT [UIScreen mainScreen].bounds.size.height
 
-@interface PagingMenuView ()<UICollectionViewDelegate, UICollectionViewDataSource>
+@interface PagingMenuView ()<UICollectionViewDelegate, UICollectionViewDataSource,UIGestureRecognizerDelegate>
 
 @property (nonatomic, strong) PagingMenuModel *model;
 
@@ -21,7 +21,7 @@
 
 @property (nonatomic, strong) UIView *sliderView;
 
-@property (nonatomic, strong) UIButton *selectButton;
+@property (nonatomic, strong) UILabel *selectLabel;
 
 /** collectionView子视图的宽 */
 @property (nonatomic, assign) CGFloat content_width;
@@ -65,23 +65,37 @@
         if (wself.model.adaptiveWidth) {
             titleWidth = [wself getViewWidthForTextContentWithTitle:obj] + wself.model.widthOffButtonWidth;
         }
-        UIButton *titlesButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [titlesButton setTitle:obj forState:UIControlStateNormal];
-        [titlesButton setTitleColor:wself.model.titleNormalColor forState:UIControlStateNormal];
-        [titlesButton setTitleColor:wself.model.titleSelectColor forState:UIControlStateSelected];
-        titlesButton.titleLabel.font = wself.model.titleFont;
-        titlesButton.frame = CGRectMake(lastView_right_x, 0, titleWidth, wself.model.headerHight);
+//        UIButton *titlesButton = [UIButton buttonWithType:UIButtonTypeCustom];
+//        [titlesButton setTitle:obj forState:UIControlStateNormal];
+//        [titlesButton setTitleColor:wself.model.titleNormalColor forState:UIControlStateNormal];
+//        [titlesButton setTitleColor:wself.model.titleSelectColor forState:UIControlStateSelected];
+//        titlesButton.titleLabel.font = wself.model.titleFont;
+//        titlesButton.frame = CGRectMake(lastView_right_x, 0, titleWidth, wself.model.headerHight);
+//        lastView_right_x = lastView_right_x + titleWidth;
+//        titlesButton.tag = 1000 + idx;
+//        [wself.buttons addObject:titlesButton];
+//        [wself.scrollView addSubview:titlesButton];
+//        [titlesButton addTarget:wself action:@selector(handleTitleEvent:) forControlEvents:UIControlEventTouchUpInside];
+        
+        UILabel *label = UILabel.new;
+        NSMutableParagraphStyle *style = NSMutableParagraphStyle.new;
+        style.alignment = NSTextAlignmentCenter;
+        NSMutableAttributedString *mAttri = [[NSMutableAttributedString alloc]initWithString:obj attributes:@{NSFontAttributeName : wself.model.titleFont,NSParagraphStyleAttributeName : style}];
+        label.frame = CGRectMake(lastView_right_x, 0, titleWidth, wself.model.headerHight);
         lastView_right_x = lastView_right_x + titleWidth;
-        titlesButton.tag = 1000 + idx;
-        [wself.buttons addObject:titlesButton];
-        [wself.scrollView addSubview:titlesButton];
-        [titlesButton addTarget:wself action:@selector(handleTitleEvent:) forControlEvents:UIControlEventTouchUpInside];
+        label.tag = 1000 + idx;
+        [wself.buttons addObject:label];
+        [wself.scrollView addSubview:label];
         if (idx == wself.currentPage) {
-            wself.selectButton = titlesButton;
-            wself.selectButton.selected = YES;
+                wself.selectLabel = label;
+//            wself.selectButton.selected = YES;
+            [mAttri addAttribute:NSForegroundColorAttributeName value:wself.model.titleSelectColor range:NSMakeRange(0, mAttri.length)];
+        }else{
+            [mAttri addAttribute:NSForegroundColorAttributeName value:wself.model.titleNormalColor range:NSMakeRange(0, mAttri.length)];
         }
+        label.attributedText = mAttri;
         if (wself.model.isAddRedDot) {
-            [wself addReddotWithButton:titlesButton];
+            [wself addReddotWithButton:label contentAttri:mAttri];
         }
     }];
     
@@ -91,7 +105,7 @@
     
     CGFloat sliderWidth = _model.sliderWidth;
     if (_model.adaptiveSliderWidth) {
-        sliderWidth = _selectButton.bounds.size.width + _model.widthOffWidth - _model.widthOffButtonWidth;
+        sliderWidth = _selectLabel.bounds.size.width + _model.widthOffWidth - _model.widthOffButtonWidth;
     }
     
     _sliderView.bounds = CGRectMake(0, 0, sliderWidth, _model.sliderHeight);
@@ -119,12 +133,18 @@
     }];
 }
 
-- (void)addReddotWithButton:(UIButton *)button {
+- (void)addReddotWithButton:(UILabel *)label contentAttri:(NSAttributedString *)contentAttri {
     MJBadgeView *badgeView = [[MJBadgeView alloc] init];
-    [button addSubview:badgeView];
+    [label addSubview:badgeView];
+    CGSize size = [contentAttri boundingRectWithSize:CGSizeMake(MAXFLOAT, 30) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading context:nil].size;
+    CGFloat offsetX = size.width > label.frame.size.width ? label.frame.size.width*0.5 : size.width*0.5;
+    CGFloat offsetY = size.height > label.frame.size.height ? label.frame.size.height*0.5 : size.height*0.5;
     [badgeView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.mas_equalTo(button.titleLabel.mas_top).mas_offset(-7.5);
-        make.right.mas_equalTo(button.titleLabel.mas_right).mas_offset(2);
+//        make.top.mas_equalTo(button.titleLabel.mas_top).mas_offset(-7.5);
+//        make.right.mas_equalTo(button.titleLabel.mas_right).mas_offset(2);
+//        make.center.equalTo(label).sizeOffset(CGSizeMake(size.width*0.5, size.height*0.5));
+        make.centerX.equalTo(label).offset(offsetX);
+        make.centerY.equalTo(label).offset(-offsetY);
         make.height.mas_equalTo(15);
     }];
     [self.redViews addObject:badgeView];
@@ -170,10 +190,10 @@
     
     CGFloat current_wdith = _model.sliderWidth;
     if (_model.adaptiveSliderWidth) {
-        current_wdith = _selectButton.bounds.size.width + _model.widthOffWidth - _model.widthOffButtonWidth;
+        current_wdith = _selectLabel.bounds.size.width + _model.widthOffWidth - _model.widthOffButtonWidth;
     }
     
-    CGFloat current_x = _selectButton.center.x - current_wdith / 2;
+    CGFloat current_x = _selectLabel.center.x - current_wdith / 2;
 
     UIButton *nextButton = nil;
     if (current_off_x > 0) {//往下一页滑动
@@ -203,7 +223,7 @@
     
     CGFloat off_percentage = current_off_x / _content_width;
     if (current_off_x > 0) {
-        distance = nextButton.center.x - _selectButton.center.x - current_wdith / 2 - next_wdith / 2;
+        distance = nextButton.center.x - _selectLabel.center.x - current_wdith / 2 - next_wdith / 2;
         CGFloat next_right_x = nextButton.center.x + next_wdith / 2;
 
         if (off_percentage < 0.5) {
@@ -217,8 +237,8 @@
             _sliderView.frame = CGRectMake(current_left_x, _sliderView.center.y - _sliderView.bounds.size.height / 2, slider_width, _sliderView.bounds.size.height);
         }
     }else {
-        distance = _selectButton.center.x - nextButton.center.x - current_wdith / 2 - next_wdith / 2;
-        CGFloat current_right_x = _selectButton.center.x + current_wdith / 2;
+        distance = _selectLabel.center.x - nextButton.center.x - current_wdith / 2 - next_wdith / 2;
+        CGFloat current_right_x = _selectLabel.center.x + current_wdith / 2;
         if (off_percentage > -0.5) {
             all_width = distance + next_wdith;
             CGFloat slider_width = current_wdith + (-off_percentage) * all_width * 2;
@@ -249,44 +269,52 @@
     return size.width;
 }
 
-- (void)handleTitleEvent:(UIButton *)sender {
-    if (_selectButton == sender) {
-        return;
-    }
-    self.currentPage = sender.tag - 1000;
-}
+//- (void)handleTitleEvent:(UIButton *)sender {
+//    if (_selectButton == sender) {
+//        return;
+//    }
+//    self.currentPage = sender.tag - 1000;
+//}
 
 - (void)setCurrentPage:(NSInteger)currentPage isAnimated:(BOOL)isAnimated {
     _currentPage = currentPage;
-    UIButton *currentButton = [_scrollView viewWithTag:1000 + currentPage];
+    UILabel *currentLabel = [_scrollView viewWithTag:1000 + currentPage];
+    //
+    NSMutableAttributedString *selectedAttri = [[NSMutableAttributedString alloc]initWithAttributedString:_selectLabel.attributedText];
+    [selectedAttri addAttributes:@{NSForegroundColorAttributeName : self.model.titleNormalColor} range:NSMakeRange(0, selectedAttri.length)];
+    _selectLabel.attributedText = selectedAttri;
+    //
+    NSMutableAttributedString *currentAttri = [[NSMutableAttributedString alloc]initWithAttributedString:currentLabel.attributedText];
+    [currentAttri addAttributes:@{NSForegroundColorAttributeName : self.model.titleSelectColor} range:NSMakeRange(0, currentAttri.length)];
+    currentLabel.attributedText = currentAttri;
     
-    _selectButton.selected = NO;
-    if (_model.titleSelectFont) {
-        _selectButton.titleLabel.font = _model.titleFont;
-    }
-    currentButton.selected = YES;
-    if (_model.titleSelectFont) {
-        currentButton.titleLabel.font = _model.titleSelectFont;
-    }
+//    _selectButton.selected = NO;
+//    if (_model.titleSelectFont) {
+//        _selectButton.titleLabel.font = _model.titleFont;
+//    }
+//    currentButton.selected = YES;
+//    if (_model.titleSelectFont) {
+//        currentButton.titleLabel.font = _model.titleSelectFont;
+//    }
     
-    _selectButton = currentButton;
+    _selectLabel = currentLabel;
     
     CGPoint center = _sliderView.center;
     CGFloat sliderWidth = _model.sliderWidth;
     if (_model.adaptiveSliderWidth) {
-        sliderWidth = _selectButton.bounds.size.width - _model.widthOffButtonWidth  + _model.widthOffWidth;
+        sliderWidth = _selectLabel.bounds.size.width - _model.widthOffButtonWidth  + _model.widthOffWidth;
     }
     __weak typeof(self) wself = self;
     [UIView animateWithDuration:0.3 animations:^{
         wself.sliderView.bounds = CGRectMake(0, 0, sliderWidth, wself.model.sliderHeight);
-        wself.sliderView.center = CGPointMake(currentButton.center.x, center.y);
+        wself.sliderView.center = CGPointMake(currentLabel.center.x, center.y);
     }];
     
     CGFloat critical_point_x = PM_SCREEN_WIDTH / 2;
     CGFloat critical_point_x_last = _scrollView.contentSize.width - critical_point_x;
-    CGFloat button_center_x = currentButton.center.x;
+    CGFloat button_center_x = currentLabel.center.x;
     if (button_center_x >= critical_point_x && button_center_x <= critical_point_x_last) {
-        [_scrollView setContentOffset:CGPointMake(currentButton.center.x - critical_point_x, 0) animated:isAnimated];
+        [_scrollView setContentOffset:CGPointMake(currentLabel.center.x - critical_point_x, 0) animated:isAnimated];
     }
     if (button_center_x < critical_point_x) {
         [_scrollView setContentOffset:CGPointMake(0, 0) animated:isAnimated];
@@ -319,8 +347,31 @@
 - (UIScrollView *)scrollView {
     if (!_scrollView) {
         _scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, PM_SCREEN_WIDTH, _model.headerHight)];
+
+        UITapGestureRecognizer *gensture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(scrollViewTapAction:)];
+        gensture.delegate = self;
+        [_scrollView addGestureRecognizer:gensture];
     }
     return _scrollView;
+}
+
+- (void)scrollViewTapAction:(UITapGestureRecognizer *)tap{
+    CGPoint point = [tap locationInView:self.scrollView];
+    for (UILabel *label in self.buttons) {
+        CALayer *layer = label.layer.presentationLayer;
+        if (CGRectContainsPoint(layer.frame, point)) {
+            if (_selectLabel == label) {
+                return;
+            }
+            self.currentPage = label.tag - 1000;
+            break;
+        }
+    }
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
+{
+    return YES;
 }
 
 - (NSMutableArray *)buttons {

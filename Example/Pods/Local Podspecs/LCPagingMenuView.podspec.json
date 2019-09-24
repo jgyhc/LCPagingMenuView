@@ -1,7 +1,7 @@
 {
   "name": "LCPagingMenuView",
-  "version": "0.1.0",
-  "summary": "A short description of LCPagingMenuView.",
+  "version": "0.1.2",
+  "summary": "分页控制LCPagingMenuView.",
   "description": "TODO: Add long description of the pod here.",
   "homepage": "https://github.com/jgyhc/LCPagingMenuView",
   "license": {
@@ -13,7 +13,7 @@
   },
   "source": {
     "git": "https://github.com/jgyhc/LCPagingMenuView.git",
-    "tag": "0.1.0"
+    "tag": "0.1.2"
   },
   "platforms": {
     "ios": "8.0"
