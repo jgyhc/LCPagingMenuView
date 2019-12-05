@@ -137,14 +137,14 @@
     MJBadgeView *badgeView = [[MJBadgeView alloc] init];
     [label addSubview:badgeView];
     CGSize size = [contentAttri boundingRectWithSize:CGSizeMake(MAXFLOAT, 30) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading context:nil].size;
-    CGFloat offsetX = size.width > label.frame.size.width ? label.frame.size.width*0.5 : size.width*0.5;
-    CGFloat offsetY = size.height > label.frame.size.height ? label.frame.size.height*0.5 : size.height*0.5;
+    CGFloat offsetX = size.width > label.frame.size.width ? label.frame.size.width*0.5 : (label.frame.size.width - size.width)*0.5;
+    CGFloat offsetY = size.height > label.frame.size.height ? label.frame.size.height*0.5 : (label.frame.size.height - size.height)*0.5;
     [badgeView mas_makeConstraints:^(MASConstraintMaker *make) {
 //        make.top.mas_equalTo(button.titleLabel.mas_top).mas_offset(-7.5);
 //        make.right.mas_equalTo(button.titleLabel.mas_right).mas_offset(2);
 //        make.center.equalTo(label).sizeOffset(CGSizeMake(size.width*0.5, size.height*0.5));
-        make.centerX.equalTo(label).offset(offsetX);
-        make.centerY.equalTo(label).offset(-offsetY);
+        make.left.equalTo(label.mas_right).offset(-offsetX);
+        make.bottom.equalTo(label.mas_top).offset(offsetY + 5);
         make.height.mas_equalTo(15);
     }];
     [self.redViews addObject:badgeView];
@@ -480,3 +480,5 @@
 }
 
 @end
+
+
